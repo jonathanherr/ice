@@ -1,7 +1,7 @@
 //
 // ice - v0.5.0
 // The MIT License
-// Copyright (c) 2012 The New York Times, CMS Group, Matthew DeLambo <delambo@gmail.com> 
+// Copyright (c) 2012 The New York Times, CMS Group, Matthew DeLambo <delambo@gmail.com>
 //
 window['rangy'] = (function() {
 
@@ -663,7 +663,7 @@ rangy.createModule("DomUtil", function(api, module) {
     var dom = api.dom;
     var DomPosition = dom.DomPosition;
     var DOMException = api.DOMException;
-    
+
     /*----------------------------------------------------------------------------------------------------------------*/
 
     // Utility functions
@@ -3425,7 +3425,7 @@ if (!('filter' in Array.prototype)) {
       this.env.element = this.element;
       this.env.document = this.element.ownerDocument;
       this.env.window = this.env.document.defaultView || this.env.document.parentWindow || window;
-      this.env.frame = null; //this.env.window.frameElement;
+      this.env.frame = this.env.window.frameElement;
       this.env.selection = this.selection = new ice.Selection(this.env);
       // Hack for using custom tags in IE 8/7
       this.env.document.createElement(this.changeTypes.insertType.tag);
@@ -3463,12 +3463,12 @@ if (!('filter' in Array.prototype)) {
       }
 
     },
- 
+
     /*
      * Updates the list of changes to include all track tags found inside the element.
      */
     findTrackTags: function () {
-      
+
       // Grab class for each changeType
       var self = this, changeTypeClasses = [];
       for (var changeType in this.changeTypes) {
@@ -4213,7 +4213,7 @@ if (!('filter' in Array.prototype)) {
         elements = ice.dom.getElementsBetween(bookmark.start, bookmark.end),
         b1 = ice.dom.parents(range.startContainer, this.blockEls.join(', '))[0],
         b2 = ice.dom.parents(range.endContainer, this.blockEls.join(', '))[0],
-        betweenBlocks = new Array(); 
+        betweenBlocks = new Array();
 
       for (var i = 0; i < elements.length; i++) {
         var elem = elements[i];
@@ -4636,10 +4636,15 @@ if (!('filter' in Array.prototype)) {
           var previousSibling = ice.dom.getPrevContentNode(contentNode, this.element);
           while (!found) {
             ctNode = this.getIceNode(previousSibling, 'deleteType');
+            insNode = this.getIceNode(previousSibling, 'insertType');
             if (!ctNode) {
               found = true;
             } else {
               previousSibling = ice.dom.getPrevContentNode(previousSibling, this.element);
+              ice.dom.removeClass(ctNode,"del cts-1");
+            }
+            if (insNode){
+              console.log(insNode);
             }
           }
           if (previousSibling) {
@@ -4649,6 +4654,7 @@ if (!('filter' in Array.prototype)) {
             }
             range.setStart(previousSibling, ice.dom.getNodeCharacterLength(previousSibling));
             range.collapse(true);
+
           }
           return true;
         } else {
@@ -4695,10 +4701,15 @@ if (!('filter' in Array.prototype)) {
         ctNode = nextDelNode;
         ctNode.insertBefore(contentNode, ctNode.firstChild);
       } else {
-	ctNode = this.createIceNode('deleteType');
-        //if we are editing a node that was inserted by the suggestion engine, 
-	if(contentNode.parentNode.className.indexOf("sugg")>=0){
-          contentNode.data="";
+        ctNode = this.createIceNode('deleteType');
+        //if we are editing a node that was inserted by the suggestion engine,
+        //delete it
+        if(contentNode.parentNode.className.indexOf("sugg_rep")>=0 ||
+           contentNode.parentNode.className.indexOf("sugg_ins")>=0 ){
+                contentNode.data="";
+        }
+        else if(contentNode.parentNode.className.indexOf("sugg_del")>=0){
+          ice.dom.removeClass(contentNode.parentNode,"sugg sugg_del");
         }
         else{
           contentNode.parentNode.insertBefore(ctNode, contentNode);
@@ -4854,7 +4865,7 @@ if (!('filter' in Array.prototype)) {
         this._preventKeyPress = false;
         return;
       }
-      
+
       if (!this.pluginsManager.fireKeyPress(e)) return false;
 
       var c = null;
@@ -5154,7 +5165,7 @@ if (!('filter' in Array.prototype)) {
       } catch(e){}
 
       // Handling jQuery bug (which may be fixed in the official release later)
-      // http://bugs.jquery.com/ticket/13401 
+      // http://bugs.jquery.com/ticket/13401
       if(ret.length === 0){
         $this.remove();
       }
@@ -6268,33 +6279,33 @@ if (!('filter' in Array.prototype)) {
        * test <em>|it</em> out
        * test| <em>it</em> out
        * tes|t <em>it</em> out
-       * 
+       *
        * A range could be mapped in one of two ways:
-       * 
+       *
        * (1) If a startContainer is a Node of type Text, Comment, or CDATASection, then startOffset
        * is the number of characters from the start of startNode. For example, the following
        * are the range properties for `<p>te|st</p>` (where "|" is the collapsed range):
-       * 
+       *
        * startContainer: <TEXT>test<TEXT>
        * startOffset: 2
        * endContainer: <TEXT>test<TEXT>
        * endOffset: 2
-       * 
+       *
        * (2) For other Node types, startOffset is the number of child nodes between the start of
        * the startNode. Take the following html fragment:
-       * 
+       *
        * `<p>some <span>test</span> text</p>`
-       * 
+       *
        * If we were working with the following range properties:
-       * 
+       *
        * startContainer: <p>
        * startOffset: 2
        * endContainer: <p>
        * endOffset: 2
-       * 
+       *
        * Since <p> is an Element node, the offsets are based on the offset in child nodes of <p> and
        * the range is selecting the second child - the <span> tag.
-       * 
+       *
        * <p><TEXT>some </TEXT><SPAN>test</SPAN><TEXT> text</TEXT></p>
        */
       rangy.rangePrototype.moveCharLeft = function (moveStart, units) {
@@ -6363,33 +6374,33 @@ if (!('filter' in Array.prototype)) {
        * test <em>i|t</em> out
        * test <em>it|</em> out
        * test <em>it</em> |out
-       * 
+       *
        * A range could be mapped in one of two ways:
-       * 
+       *
        * (1) If a startContainer is a Node of type Text, Comment, or CDATASection, then startOffset
        * is the number of characters from the start of startNode. For example, the following
        * are the range properties for `<p>te|st</p>` (where "|" is the collapsed range):
-       * 
+       *
        * startContainer: <TEXT>test<TEXT>
        * startOffset: 2
        * endContainer: <TEXT>test<TEXT>
        * endOffset: 2
-       * 
+       *
        * (2) For other Node types, startOffset is the number of child nodes between the start of
        * the startNode. Take the following html fragment:
-       * 
+       *
        * `<p>some <span>test</span> text</p>`
-       * 
+       *
        * If we were working with the following range properties:
-       * 
+       *
        * startContainer: <p>
        * startOffset: 2
        * endContainer: <p>
        * endOffset: 2
-       * 
+       *
        * Since <p> is an Element node, the offsets are based on the offset in child nodes of <p> and
        * the range is selecting the second child - the <span> tag.
-       * 
+       *
        * <p><TEXT>some </TEXT><SPAN>test</SPAN><TEXT> text</TEXT></p>
        */
       rangy.rangePrototype.moveCharRight = function (moveStart, units) {
@@ -7020,7 +7031,7 @@ exports.IcePluginManager = IcePluginManager;
 (function() {
 
 var exports = this, IceAddTitlePlugin;
-  
+
 IceAddTitlePlugin = function(ice_instance) {
   this._ice = ice_instance;
 };
@@ -7047,7 +7058,7 @@ IceCopyPastePlugin = function(ice_instance) {
   this._tmpNodeTagName = 'icepaste';
   this._pasteId = 'icepastediv';
   var self = this;
-  
+
   // API
 
   // 'formatted' - paste will be MS Word cleaned.
@@ -7141,7 +7152,7 @@ IceCopyPastePlugin.prototype = {
         this.setupPaste(true);
         break;
     }
-             
+
     return true;
   },
 
@@ -7151,7 +7162,7 @@ IceCopyPastePlugin.prototype = {
     var div = this.createDiv(this._pasteId),
         self = this,
         range = this._ice.getCurrentRange();
-    
+
     range.selectNodeContents(div);
     this._ice.selection.addRange(range);
 
@@ -7182,7 +7193,7 @@ IceCopyPastePlugin.prototype = {
     html = this.beforePasteClean.call(this, html);
 
     if(stripTags) {
-                    
+
       // Strip out change tracking tags.
       html = this._ice.getCleanContent(html);
       html = this.stripPaste(html);
@@ -7215,7 +7226,7 @@ IceCopyPastePlugin.prototype = {
       range.collapse(true);
       this._ice.selection.addRange(range);
       var prevBlock = range.startContainer;
-      
+
       // Paste all of the children in the fragment.
       while(fragment.firstChild) {
         if(fragment.firstChild.nodeType === 3 && !jQuery.trim(fragment.firstChild.nodeValue)) {
@@ -7338,7 +7349,7 @@ IceCopyPastePlugin.prototype = {
         self._ice.env.selection.addRange(range);
       }, 100);
     }, 0);
-    
+
     self._ice.env.selection.addRange(crange);
   },
 
@@ -7363,7 +7374,7 @@ IceCopyPastePlugin.prototype = {
     var self = this;
     this._tags = '';
     this._attributesMap = [];
-    
+
     ice.dom.each(this.preserve.split(','), function(i, tagAttr) {
       // Extract the tag and attributes list
       tagAttr.match(/(\w+)(\[(.+)\])?/);
@@ -7433,7 +7444,7 @@ IceCopyPastePlugin.prototype = {
 
     // Remove class, lang and style attributes.
     content = content.replace(/<(\w[^>]*) (lang)=([^ |>]*)([^>]*)/gi, "<$1$4");
-  
+
     return content;
   },
 
@@ -7460,7 +7471,7 @@ IceCopyPastePlugin.prototype = {
       range.setStartAfter(moveTo);
       range.collapse(true);
       this._ice.selection.addRange(range);
-      
+
       // Kill the tmp node.
       this._tmpNode.parentNode.removeChild(this._tmpNode);
       this._tmpNode = null;
@@ -7510,7 +7521,7 @@ IceSmartQuotesPlugin.prototype = {
       self._ice.revertDeletePlaceholders();
     }
   },
-  
+
   // Converts the quotes in the given element to smart quotes.
   _convertBlock: function(el) {
 
@@ -7548,11 +7559,11 @@ IceSmartQuotesPlugin.prototype = {
     getNextChar = function(data, fromIndex, nCharacters) {
       var dLength = data.length,
         addWith = nCharacters < 0 ? -1 : 1;
-    
+
       return (function getChar(data, fromIndex, nCharacters) {
         // Base case - did we move outside of the bounds of the data array?
         if (fromIndex < 0 || fromIndex >= dLength) return null;
-        
+
         var next = data[fromIndex + addWith];
 
         // If we find a character and we have moved through the
@@ -7573,40 +7584,40 @@ IceSmartQuotesPlugin.prototype = {
       // If the val is a character, then examine the surroundings
       // and convert smart quotes, if necessary.
       if (val.length == 1) {
-        
+
         // Keep convenience pointers to the previous, current and next characters.
         previous = getNextChar(data, pos, -1);
         current = val;
         next = getNextChar(data, pos, 1);
 
         switch (current) {
-          
+
           /**
            * Conversion Rules:
            * ----------------
-           * 
+           *
            * START: assign smart left/open
            *   [SPACE|START_PARENTHESIS]'word
            *   [SPACE|START_PARENTHESIS]"word
-           * 
+           *
            * END: assign smart right/close
            *   word'[SPACE|SEMICOLON|COLON|PERIOD|COMMA|EXCLAMATION_MARK|QUESTION_MARK|END_PARENTHESIS|NULL]
            *   word"[SPACE|SEMICOLON|COLON|PERIOD|COMMA|EXCLAMATION_MARK|QUESTION_MARK|END_PARENTHESIS|NULL]
-           * 
+           *
            * PLURAL_CONTRACTION: assign smart right/close
            *   Matt's
            *   can't
            *   O'Reilly
-           * 
+           *
            * YEAR_ABBREVIATION: assign smart right/close
            *   [SPACE|NULL]'99[SPACE|SEMICOLON|COLON|PERIOD|COMMA|EXCLAMATION_MARK|QUESTION_MARK|END_PARENTHESIS|NULL]
-           * 
+           *
            * NESTED_START: assign smart left/open
            *   [SPACE|NULL]"[SPACE]'word
-           * 
+           *
            * NESTED_END: assign smart left/open
            *   word'[SPACE]"[SPACE|SEMICOLON|COLON|PERIOD|COMMA|EXCLAMATION_MARK|QUESTION_MARK|END_PARENTHESIS|NULL]
-           * 
+           *
            * Notes:
            *  - The following will not be converted correctly - ...word 'Til Death - it should
            *  get a right/close smart quote, but will get a left/open.
@@ -7616,7 +7627,7 @@ IceSmartQuotesPlugin.prototype = {
            *  handled (6'8", 6' 8", 6', 8").
            */
 
-          // Convert smart single quotes to non-smart quote and fall through to single quote 
+          // Convert smart single quotes to non-smart quote and fall through to single quote
           // handling, in case the context has changed and we need to update the smart quote.
           case smartSingleLeft:
           case smartSingleRight:
@@ -7635,8 +7646,8 @@ IceSmartQuotesPlugin.prototype = {
             else if (isChar(previous) && isChar(next))
               current = smartSingleRight;
             break;
-          
-          // Convert smart double quotes to non-smart quote and fall through to double quote 
+
+          // Convert smart double quotes to non-smart quote and fall through to double quote
           // handling, in case the context has changed and we need to update the smart quote.
           case smartDoubleLeft:
           case smartDoubleRight:
@@ -7659,7 +7670,7 @@ IceSmartQuotesPlugin.prototype = {
         if (current != null) data[pos] = current;
       }
     });
-    
+
     ice.dom.setHtml(el, data.join(''));
   }
 };
@@ -7674,7 +7685,7 @@ var exports = this;
 
 /**
  * When active, this plugin will convert two successively typed dashes, within
- * the ice block element, into an emdash. 
+ * the ice block element, into an emdash.
  */
 var IceEmdashPlugin = function(ice_instance) {
 	this._ice = ice_instance;
@@ -7694,7 +7705,7 @@ IceEmdashPlugin.prototype = {
 		}
 		return true;
 	},
-	
+
 	convertEmdash: function(e) {
 		var range = this._ice.getCurrentRange();
 		if(range.collapsed) {
