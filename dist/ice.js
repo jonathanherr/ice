@@ -3425,7 +3425,7 @@ if (!('filter' in Array.prototype)) {
       this.env.element = this.element;
       this.env.document = this.element.ownerDocument;
       this.env.window = this.env.document.defaultView || this.env.document.parentWindow || window;
-      this.env.frame = null; //this.env.window.frameElement;
+      this.env.frame = this.env.window.frameElement;
       this.env.selection = this.selection = new ice.Selection(this.env);
       // Hack for using custom tags in IE 8/7
       this.env.document.createElement(this.changeTypes.insertType.tag);
@@ -4636,16 +4636,13 @@ if (!('filter' in Array.prototype)) {
           var previousSibling = ice.dom.getPrevContentNode(contentNode, this.element);
           while (!found) {
             ctNode = this.getIceNode(previousSibling, 'deleteType');
-            insNode = this.getIceNode(previousSibling, 'insertType');
             if (!ctNode) {
               found = true;
             } else {
               previousSibling = ice.dom.getPrevContentNode(previousSibling, this.element);
               ice.dom.removeClass(ctNode,"del cts-1");
             }
-            if (insNode){
-              console.log(insNode);
-            }
+
           }
           if (previousSibling) {
             var lastSelectable = range.getLastSelectableChild(previousSibling);
@@ -4705,7 +4702,8 @@ if (!('filter' in Array.prototype)) {
         //if we are editing a node that was inserted by the suggestion engine,
         //delete it
         if(contentNode.parentNode.className.indexOf("sugg_rep")>=0 ||
-           contentNode.parentNode.className.indexOf("sugg_ins")>=0 ){
+           contentNode.parentNode.className.indexOf("sugg_ins")>=0  ||
+           contentNode.parentNode.className.indexOf("ins cts")>=0){
                 contentNode.data="";
         }
         else if(contentNode.parentNode.className.indexOf("sugg_del")>=0){
