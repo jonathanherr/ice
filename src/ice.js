@@ -153,7 +153,7 @@
       this.env.element = this.element;
       this.env.document = this.element.ownerDocument;
       this.env.window = this.env.document.defaultView || this.env.document.parentWindow || window;
-      this.env.frame = this.env.window.frameElement;
+      this.env.frame = null; //this.env.window.frameElement;
       this.env.selection = this.selection = new ice.Selection(this.env);
       // Hack for using custom tags in IE 8/7
       this.env.document.createElement(this.changeTypes.insertType.tag);
