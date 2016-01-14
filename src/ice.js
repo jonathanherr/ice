@@ -1423,9 +1423,15 @@
         ctNode = nextDelNode;
         ctNode.insertBefore(contentNode, ctNode.firstChild);
       } else {
-        ctNode = this.createIceNode('deleteType');
-        contentNode.parentNode.insertBefore(ctNode, contentNode);
-        ctNode.appendChild(contentNode);
+	ctNode = this.createIceNode('deleteType');
+        //if we are editing a node that was inserted by the suggestion engine, 
+	if(contentNode.parentNode.className.indexOf("sugg")>=0){
+          contentNode.data="";
+        }
+        else{
+          contentNode.parentNode.insertBefore(ctNode, contentNode);
+          ctNode.appendChild(contentNode);
+        }
       }
 
       if (range) {
