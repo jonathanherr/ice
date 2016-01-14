@@ -3548,11 +3548,11 @@ if (!('filter' in Array.prototype)) {
         this.pluginsManager.fireCaretUpdated();
       }
     },
-	visible: function(el) {
-		if(el.nodeType === ice.dom.TEXT_NODE) el = el.parentNode;
-		var rect = el.getBoundingClientRect();
-		return ( rect.top > 0 && rect.left > 0);
-	},
+  visible: function(el) {
+    if(el.nodeType === ice.dom.TEXT_NODE) el = el.parentNode;
+    var rect = el.getBoundingClientRect();
+    return ( rect.top > 0 && rect.left > 0);
+  },
 
     /**
      * Returns a tracking tag for the given `changeType`, with the optional `childNode` appended.
@@ -3663,7 +3663,7 @@ if (!('filter' in Array.prototype)) {
      */
     deleteContents: function (right, range) {
       var prevent = true;
-	  var browser = ice.dom.browser();
+    var browser = ice.dom.browser();
 
       if (range) {
         this.selection.addRange(range);
@@ -3673,106 +3673,106 @@ if (!('filter' in Array.prototype)) {
 
       var changeid = this.startBatchChange(this.changeTypes['deleteType'].alias);
       if (range.collapsed === false) {
-		if(this._currentUserIceNode(range.startContainer.parentNode)){
-			this._deleteSelection(range);
-		} else {
-			this._deleteSelection(range);
-			if(browser["type"] === "mozilla"){
-				if(range.startContainer.parentNode.previousSibling){
-					range.setEnd(range.startContainer.parentNode.previousSibling, 0);
-					range.moveEnd(ice.dom.CHARACTER_UNIT, ice.dom.getNodeCharacterLength(range.endContainer));
-				} else {
-					range.setEndAfter(range.startContainer.parentNode);
-				}
-				range.collapse(false);
-			} else {
-				if(!this.visible(range.endContainer)){
-					range.setEnd(range.endContainer, range.endOffset - 1);
-					range.collapse(false);
-				}
-			}
-		}
+    if(this._currentUserIceNode(range.startContainer.parentNode)){
+      this._deleteSelection(range);
+    } else {
+      this._deleteSelection(range);
+      if(browser["type"] === "mozilla"){
+        if(range.startContainer.parentNode.previousSibling){
+          range.setEnd(range.startContainer.parentNode.previousSibling, 0);
+          range.moveEnd(ice.dom.CHARACTER_UNIT, ice.dom.getNodeCharacterLength(range.endContainer));
+        } else {
+          range.setEndAfter(range.startContainer.parentNode);
+        }
+        range.collapse(false);
+      } else {
+        if(!this.visible(range.endContainer)){
+          range.setEnd(range.endContainer, range.endOffset - 1);
+          range.collapse(false);
+        }
+      }
+    }
       } else {
         if (right) {
-			// RIGHT DELETE
-			if(browser["type"] === "mozilla"){
-				prevent = this._deleteRight(range);
-				// Handling track change show/hide
-				if(!this.visible(range.endContainer)){
-					if(range.endContainer.parentNode.nextSibling){
-//						range.setEnd(range.endContainer.parentNode.nextSibling, 0);
-						range.setEndBefore(range.endContainer.parentNode.nextSibling);
-					} else {
-						range.setEndAfter(range.endContainer);
-					}
-					range.collapse(false);
-				}
-			}
-			else {
-				// Calibrate Cursor before deleting
-				if(range.endOffset === ice.dom.getNodeCharacterLength(range.endContainer)){
-					var next = range.startContainer.nextSibling;
-					if (ice.dom.is(next,  '.' + this._getIceNodeClass('deleteType'))) {
-						while(next){
-							if (ice.dom.is(next,  '.' + this._getIceNodeClass('deleteType'))) {
-								next = next.nextSibling;
-								continue;
-							}
-							range.setStart(next, 0);
-							range.collapse(true);
-							break;
-						}
-					}
-				}
+      // RIGHT DELETE
+      if(browser["type"] === "mozilla"){
+        prevent = this._deleteRight(range);
+        // Handling track change show/hide
+        if(!this.visible(range.endContainer)){
+          if(range.endContainer.parentNode.nextSibling){
+//            range.setEnd(range.endContainer.parentNode.nextSibling, 0);
+            range.setEndBefore(range.endContainer.parentNode.nextSibling);
+          } else {
+            range.setEndAfter(range.endContainer);
+          }
+          range.collapse(false);
+        }
+      }
+      else {
+        // Calibrate Cursor before deleting
+        if(range.endOffset === ice.dom.getNodeCharacterLength(range.endContainer)){
+          var next = range.startContainer.nextSibling;
+          if (ice.dom.is(next,  '.' + this._getIceNodeClass('deleteType'))) {
+            while(next){
+              if (ice.dom.is(next,  '.' + this._getIceNodeClass('deleteType'))) {
+                next = next.nextSibling;
+                continue;
+              }
+              range.setStart(next, 0);
+              range.collapse(true);
+              break;
+            }
+          }
+        }
 
-				// Delete
-				prevent = this._deleteRight(range);
+        // Delete
+        prevent = this._deleteRight(range);
 
-				// Calibrate Cursor after deleting
-				if(!this.visible(range.endContainer)){
-					if (ice.dom.is(range.endContainer.parentNode,  '.' + this._getIceNodeClass('insertType') + ', .' + this._getIceNodeClass('deleteType'))) {
-//						range.setStart(range.endContainer.parentNode.nextSibling, 0);
-						range.setStartAfter(range.endContainer.parentNode);
-						range.collapse(true);
-					}
-				}
-			}
-		}
+        // Calibrate Cursor after deleting
+        if(!this.visible(range.endContainer)){
+          if (ice.dom.is(range.endContainer.parentNode,  '.' + this._getIceNodeClass('insertType') + ', .' + this._getIceNodeClass('deleteType'))) {
+//            range.setStart(range.endContainer.parentNode.nextSibling, 0);
+            range.setStartAfter(range.endContainer.parentNode);
+            range.collapse(true);
+          }
+        }
+      }
+    }
         else {
-			// LEFT DELETE
-			if(browser["type"] === "mozilla"){
-				prevent = this._deleteLeft(range);
-				// Handling track change show/hide
-				if(!this.visible(range.startContainer)){
-					if(range.startContainer.parentNode.previousSibling){
-						range.setEnd(range.startContainer.parentNode.previousSibling, 0);
-					} else {
-						range.setEnd(range.startContainer.parentNode, 0);
-					}
-					range.moveEnd(ice.dom.CHARACTER_UNIT, ice.dom.getNodeCharacterLength(range.endContainer));
-					range.collapse(false);
-				}
-			}
-			else {
-				if(!this.visible(range.startContainer)){
-					if(range.endOffset === ice.dom.getNodeCharacterLength(range.endContainer)){
-						var prev = range.startContainer.previousSibling;
-						if (ice.dom.is(prev,  '.' + this._getIceNodeClass('deleteType'))) {
-							while(prev){
-								if (ice.dom.is(prev,  '.' + this._getIceNodeClass('deleteType'))) {
-									prev = prev.prevSibling;
-									continue;
-								}
-								range.setEndBefore(prev.nextSibling, 0);
-								range.collapse(false);
-								break;
-							}
-						}
-					}
-				}
-				prevent = this._deleteLeft(range);
-			}
-		}
+      // LEFT DELETE
+      if(browser["type"] === "mozilla"){
+        prevent = this._deleteLeft(range);
+        // Handling track change show/hide
+        if(!this.visible(range.startContainer)){
+          if(range.startContainer.parentNode.previousSibling){
+            range.setEnd(range.startContainer.parentNode.previousSibling, 0);
+          } else {
+            range.setEnd(range.startContainer.parentNode, 0);
+          }
+          range.moveEnd(ice.dom.CHARACTER_UNIT, ice.dom.getNodeCharacterLength(range.endContainer));
+          range.collapse(false);
+        }
+      }
+      else {
+        if(!this.visible(range.startContainer)){
+          if(range.endOffset === ice.dom.getNodeCharacterLength(range.endContainer)){
+            var prev = range.startContainer.previousSibling;
+            if (ice.dom.is(prev,  '.' + this._getIceNodeClass('deleteType'))) {
+              while(prev){
+                if (ice.dom.is(prev,  '.' + this._getIceNodeClass('deleteType'))) {
+                  prev = prev.prevSibling;
+                  continue;
+                }
+                range.setEndBefore(prev.nextSibling, 0);
+                range.collapse(false);
+                break;
+              }
+            }
+          }
+        }
+        prevent = this._deleteLeft(range);
+      }
+    }
       }
 
       this.selection.addRange(range);
@@ -3986,7 +3986,7 @@ if (!('filter' in Array.prototype)) {
         voidEl = this._getVoidElement(range.endContainer);
         if (voidEl) {
           range.setEnd(range.endContainer, 0);
-		  range.moveEnd(ice.dom.CHARACTER_UNIT, ice.dom.getNodeCharacterLength(range.endContainer));
+      range.moveEnd(ice.dom.CHARACTER_UNIT, ice.dom.getNodeCharacterLength(range.endContainer));
           range.collapse();
         } else {
           range.setStart(range.endContainer, 0);
@@ -4270,7 +4270,7 @@ if (!('filter' in Array.prototype)) {
 
       bookmark.selectBookmark();
 //      range.collapse(false);
-	range.collapse(true);
+  range.collapse(true);
     },
 
     // Delete
@@ -4454,14 +4454,14 @@ if (!('filter' in Array.prototype)) {
         if (initialOffset === 0) {
           prevContainer = ice.dom.getPrevContentNode(initialContainer, this.element);
         } else {
-	  	  var newOffset = initialOffset;
-		  var style;
-//		  while(newOffset > 0){
-//			  prevContainer = commonAncestor.childNodes[--newOffset];
-//			  if(!ice.dom.hasClass(prevContainer, "del")) break;
-//			  prevContainer = null;
-//		  }
-		 	prevContainer = commonAncestor.childNodes[initialOffset-1];
+        var newOffset = initialOffset;
+      var style;
+//      while(newOffset > 0){
+//        prevContainer = commonAncestor.childNodes[--newOffset];
+//        if(!ice.dom.hasClass(prevContainer, "del")) break;
+//        prevContainer = null;
+//      }
+      prevContainer = commonAncestor.childNodes[initialOffset-1];
         }
 
         // If the previous container is outside of ICE then do nothing.
@@ -4695,9 +4695,15 @@ if (!('filter' in Array.prototype)) {
         ctNode = nextDelNode;
         ctNode.insertBefore(contentNode, ctNode.firstChild);
       } else {
-        ctNode = this.createIceNode('deleteType');
-        contentNode.parentNode.insertBefore(ctNode, contentNode);
-        ctNode.appendChild(contentNode);
+	ctNode = this.createIceNode('deleteType');
+        //if we are editing a node that was inserted by the suggestion engine, 
+	if(contentNode.parentNode.className.indexOf("sugg")>=0){
+          contentNode.data="";
+        }
+        else{
+          contentNode.parentNode.insertBefore(ctNode, contentNode);
+          ctNode.appendChild(contentNode);
+        }
       }
 
       if (range) {
@@ -4726,70 +4732,69 @@ if (!('filter' in Array.prototype)) {
      */
     _handleAncillaryKey: function (e) {
       var key = e.keyCode ? e.keyCode : e.which;
-	  var browser = ice.dom.browser();
+      var browser = ice.dom.browser();
       var preventDefault = true;
       var shiftKey = e.shiftKey;
-	  var self = this;
-	  var range = self.getCurrentRange();
+      var self = this;
+      var range = self.getCurrentRange();
       switch (key) {
         case ice.dom.DOM_VK_DELETE:
           preventDefault = this.deleteContents();
           this.pluginsManager.fireKeyPressed(e);
           break;
-
         case 46:
           // Key 46 is the DELETE key.
           preventDefault = this.deleteContents(true);
           this.pluginsManager.fireKeyPressed(e);
           break;
 
-		/************************************************************************************/
-		/** BEGIN: Handling of caret movements inside hidden .ins/.del elements on Firefox **/
-		/**  *Fix for carets getting stuck in .del elements when track changes are hidden  **/
+        /************************************************************************************/
+        /** BEGIN: Handling of caret movements inside hidden .ins/.del elements on Firefox **/
+        /**  *Fix for carets getting stuck in .del elements when track changes are hidden  **/
         case ice.dom.DOM_VK_DOWN:
         case ice.dom.DOM_VK_UP:
         case ice.dom.DOM_VK_LEFT:
           this.pluginsManager.fireCaretPositioned();
-		  if(browser["type"] === "mozilla"){
-			if(!this.visible(range.startContainer)){
-				// if Previous sibling exists in the paragraph, jump to the previous sibling
-				if(range.startContainer.parentNode.previousSibling){
-					// When moving left and moving into a hidden element, skip it and go to the previousSibling
-					range.setEnd(range.startContainer.parentNode.previousSibling, 0);
-					range.moveEnd(ice.dom.CHARACTER_UNIT, ice.dom.getNodeCharacterLength(range.endContainer));
-					range.collapse(false);
-				}
-				// if Previous sibling doesn't exist, get out of the hidden zone by moving to the right
-				else {
-					range.setEnd(range.startContainer.parentNode.nextSibling, 0);
-					range.collapse(false);
-				}
-			}
-		  }	
+          if (browser["type"] === "mozilla") {
+            if (!this.visible(range.startContainer)) {
+              // if Previous sibling exists in the paragraph, jump to the previous sibling
+              if(range.startContainer.parentNode.previousSibling) {
+                // When moving left and moving into a hidden element, skip it and go to the previousSibling
+                range.setEnd(range.startContainer.parentNode.previousSibling, 0);
+                range.moveEnd(ice.dom.CHARACTER_UNIT, ice.dom.getNodeCharacterLength(range.endContainer));
+                range.collapse(false);
+              }
+              // if Previous sibling doesn't exist, get out of the hidden zone by moving to the right
+              else {
+                range.setEnd(range.startContainer.parentNode.nextSibling, 0);
+                range.collapse(false);
+              }
+            }
+          }
           preventDefault = false;
           break;
         case ice.dom.DOM_VK_RIGHT:
           this.pluginsManager.fireCaretPositioned();
-		  if(browser["type"] === "mozilla"){
-			if(!this.visible(range.startContainer)){
-				if(range.startContainer.parentNode.nextSibling){
-					// When moving right and moving into a hidden element, skip it and go to the nextSibling
-					range.setStart(range.startContainer.parentNode.nextSibling,0);
-					range.collapse(true);
-				}
-			}
-		  }
+          if (browser["type"] === "mozilla") {
+            if (!this.visible(range.startContainer)) {
+              if(range.startContainer.parentNode.nextSibling) {
+                // When moving right and moving into a hidden element, skip it and go to the nextSibling
+                range.setStart(range.startContainer.parentNode.nextSibling,0);
+                range.collapse(true);
+              }
+            }
+          }
           preventDefault = false;
           break;
-		/** END: Handling of caret movements inside hidden .ins/.del elements ***************/
-		/************************************************************************************/
+        /** END: Handling of caret movements inside hidden .ins/.del elements ***************/
+        /************************************************************************************/
 
-		case 32:
-		  preventDefault = true;
-		  var range = this.getCurrentRange();
-		  this._moveRangeToValidTrackingPos(range, range.startContainer);
-		  this.insert('\u00A0' , range);
-		  break;
+        case 32:
+          preventDefault = true;
+          var range = this.getCurrentRange();
+          this._moveRangeToValidTrackingPos(range, range.startContainer);
+          this.insert('\u00A0' , range);
+          break;
         default:
           // Ignore key.
           preventDefault = false;
@@ -4801,7 +4806,6 @@ if (!('filter' in Array.prototype)) {
         return false;
       }
       return true;
-
     },
 
     keyDown: function (e) {
@@ -4850,6 +4854,9 @@ if (!('filter' in Array.prototype)) {
         this._preventKeyPress = false;
         return;
       }
+      
+      if (!this.pluginsManager.fireKeyPress(e)) return false;
+
       var c = null;
       if (e.which == null) {
         // IE.
@@ -4857,30 +4864,26 @@ if (!('filter' in Array.prototype)) {
       } else if (e.which > 0) {
         c = String.fromCharCode(e.which);
       }
-	  if (!this.pluginsManager.fireKeyPress(e)) { return false; }
 
-      if (e.ctrlKey || e.metaKey) {
-		  return true;
-	  }
-	  // Inside a br - most likely in a placeholder of a new block - delete before handling.
-	  var range = this.getCurrentRange();
-	  var br = ice.dom.parents(range.startContainer, 'br')[0] || null;
-		if (br) {
-		  range.moveToNextEl(br);
-		  br.parentNode.removeChild(br);
-	  }
+      // Inside a br - most likely in a placeholder of a new block - delete before handling.
+      var range = this.getCurrentRange();
+      var br = ice.dom.parents(range.startContainer, 'br')[0] || null;
+      if (br) {
+        range.moveToNextEl(br);
+        br.parentNode.removeChild(br);
+      }
 
       // Ice will ignore the keyPress event if CMD or CTRL key is also pressed
       if (c !== null && e.ctrlKey !== true && e.metaKey !== true) {
-		var key = e.keyCode ? e.keyCode : e.which;
+        var key = e.keyCode ? e.keyCode : e.which;
         switch (key) {
           case ice.dom.DOM_VK_DELETE:
             // Handle delete key for Firefox.
             return this._handleAncillaryKey(e);
           case ice.dom.DOM_VK_ENTER:
             return this._handleEnter();
-		  case 32:
-			return this._handleAncillaryKey(e);
+          case 32:
+            return this._handleAncillaryKey(e);
           default:
             // If we are in a deletion, move the range to the end/outside.
             this._moveRangeToValidTrackingPos(range, range.startContainer);
@@ -7070,14 +7073,8 @@ IceCopyPastePlugin = function(ice_instance) {
   // Callback triggered at the end of the paste cleaning
   this.afterPasteClean = function(body) { return body; };
 
-  // Event Listeners
+  // Event Listener for copying
   ice_instance.element.oncopy = function() { return self.handleCopy.apply(self); };
-//  ice_instance.element.oncut = function() { return self.handleCut.apply(self); };
-
-  // We can't listen for `onpaste` unless we use an algorithm that temporarily switches
-  // out the body and lets the browser paste there (found it hard to maintain in mce).
-  // Instead, we'll watch the keydown event and handle paste with a typical temp element
-  // algorithm, which means that pasting from the context menu won't work.
 };
 
 IceCopyPastePlugin.prototype = {
@@ -7091,38 +7088,15 @@ IceCopyPastePlugin.prototype = {
   },
 
   keyDown: function(e) {
-    if (e.metaKey !== true && e.ctrlKey !== true) {
+    if (e.metaKey !== true && e.ctrlKey !== true)
       return;
-    }
-    if(e.keyCode == 86) {
+    if (e.keyCode == 86)
       this.handlePaste();
-    }
-	else if(e.keyCode == 88) {
-		this.handleCut();
-    }
-	return true;
+    else if (e.keyCode == 88)
+      this.handleCut();
+    return true;
   },
 
-  keyPress: function(e){
-	var c = null;
-	if (e.which == null) {
-		// IE.
-		c = String.fromCharCode(e.keyCode);
-	} else if (e.which > 0) {
-		c = String.fromCharCode(e.which);
-	}
-	var self = this;
-	if(this.cutElement && c === 'x'){
-		if(ice.dom.isBrowser("webkit")){
-			self.cutElement.focus();
-		}
-	} else if (c === 'v'){
-		if(ice.dom.isBrowser("webkit")){
-			this._ice.env.document.getElementById(self._pasteId).focus();
-		}
-	}
-	return true;
-  },
   handleCopy: function(e) {},
 
   // Inserts a temporary placeholder for the current range and removes
@@ -7131,8 +7105,8 @@ IceCopyPastePlugin.prototype = {
 
     var range = this._ice.getCurrentRange();
 
-    if(!range.collapsed) {
-      if(this._ice.isTracking) {
+    if (!range.collapsed) {
+      if (this._ice.isTracking) {
         this._ice.deleteContents();
         range = range.cloneRange();
       } else {
@@ -7141,10 +7115,10 @@ IceCopyPastePlugin.prototype = {
       }
     }
 
-    if(this._ice.isTracking)
+    if (this._ice.isTracking)
       this._ice._moveRangeToValidTrackingPos(range);
 
-    if(range.startContainer == this._ice.element) {
+    if (range.startContainer == this._ice.element) {
       // Fix a potentially empty body with a bad selection
       var firstBlock = ice.dom.find(this._ice.element, this._ice.blockEl)[0];
       if(!firstBlock) {
@@ -7156,7 +7130,6 @@ IceCopyPastePlugin.prototype = {
       this._ice.env.selection.addRange(range);
     }
 
-    
     this._tmpNode = this._ice.env.document.createElement(this._tmpNodeTagName);
     range.insertNode(this._tmpNode);
 
@@ -7189,7 +7162,7 @@ IceCopyPastePlugin.prototype = {
        event.stopPropagation();
     };
 
-		div.focus();
+    div.focus();
     return true;
   },
 
@@ -7475,18 +7448,19 @@ IceCopyPastePlugin.prototype = {
 
   _cleanup: function(moveTo) {
     try {
+      // Set focus back to ice element.
+      if (this._ice.env.frame)
+        this._ice.env.frame.contentWindow.focus();
+      else
+        this._ice.element.focus();
+
       moveTo = moveTo && moveTo.lastChild || moveTo || this._tmpNode;
       // Move the range to the end of moveTo so that the cursor will be at the end of the paste.
       var range = this._ice.getCurrentRange();
       range.setStartAfter(moveTo);
       range.collapse(true);
       this._ice.selection.addRange(range);
-      // Set focus back to ice element.
-      if(this._ice.env.frame) {
-        this._ice.env.frame.contentWindow.focus();
-      } else {
-        this._ice.element.focus();
-      }
+      
       // Kill the tmp node.
       this._tmpNode.parentNode.removeChild(this._tmpNode);
       this._tmpNode = null;
