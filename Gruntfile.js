@@ -100,7 +100,7 @@ module.exports = function(grunt) {
           mode: 'gzip',
           archive: 'ice.min.gz'
         },
-        dest: 'dist/',
+        dest: 'dist/ice.min.gz',
         src: 'dist/ice.min.js'
       },
       zip: {
