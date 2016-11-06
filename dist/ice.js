@@ -288,7 +288,7 @@ window['rangy'] = (function() {
 
     return api;
 })();
-rangy.createModule("DomUtil", function(api, module) {
+ice_rangy.createModule("DomUtil", function(api, module) {
 
     var UNDEF = "undefined";
     var util = api.util;
@@ -656,7 +656,7 @@ rangy.createModule("DomUtil", function(api, module) {
     };
 
     api.DOMException = DOMException;
-});rangy.createModule("DomRange", function(api, module) {
+});ice_rangy.createModule("DomRange", function(api, module) {
     api.requireModules( ["DomUtil"] );
 
 
@@ -1859,7 +1859,7 @@ rangy.createModule("DomUtil", function(api, module) {
 
     api.DomRange = Range;
     api.RangeException = RangeException;
-});rangy.createModule("WrappedRange", function(api, module) {
+});ice_rangy.createModule("WrappedRange", function(api, module) {
     api.requireModules( ["DomUtil", "DomRange"] );
 
     /**
@@ -2426,7 +2426,7 @@ rangy.createModule("DomUtil", function(api, module) {
         }
         doc = win = null;
     });
-});rangy.createModule("WrappedSelection", function(api, module) {
+});ice_rangy.createModule("WrappedSelection", function(api, module) {
     // This will create a selection object wrapper that follows the Selection object found in the WHATWG draft DOM Range
     // spec (http://html5.org/specs/dom-range.html)
 
@@ -6165,10 +6165,10 @@ if (!('filter' in Array.prototype)) {
 		  this._selection.refresh();
 	  }
       else if (this.env.frame) {
-		  this._selection = rangy.getIframeSelection(this.env.frame);
+		  this._selection = ice_rangy.getIframeSelection(this.env.frame);
 	  }
       else {
-		  this._selection = rangy.getSelection();
+		  this._selection = ice_rangy.getSelection();
 	  }
       return this._selection;
     },
@@ -6177,7 +6177,7 @@ if (!('filter' in Array.prototype)) {
      * Creates a range object.
      */
     createRange: function () {
-      return rangy.createRange(this.env.document);
+      return ice_rangy.createRange(this.env.document);
     },
 
     /**
@@ -6212,8 +6212,8 @@ if (!('filter' in Array.prototype)) {
     _initializeRangeLibrary: function () {
       var self = this;
 
-      rangy.init();
-      rangy.config.checkSelectionRanges = false;
+      ice_rangy.init();
+      ice_rangy.config.checkSelectionRanges = false;
 
       var move = function (range, unitType, units, isStart) {
         if (units === 0) {
@@ -6240,7 +6240,7 @@ if (!('filter' in Array.prototype)) {
        * Moves the start of the range using the specified `unitType`, by the specified
        * number of `units`. Defaults to `CHARACTER_UNIT` and units of 1.
        */
-      rangy.rangePrototype.moveStart = function (unitType, units) {
+      ice_rangy.rangePrototype.moveStart = function (unitType, units) {
         move(this, unitType, units, true);
       };
 
@@ -6248,7 +6248,7 @@ if (!('filter' in Array.prototype)) {
        * Moves the end of the range using the specified `unitType`, by the specified
        * number of `units`.
        */
-      rangy.rangePrototype.moveEnd = function (unitType, units) {
+      ice_rangy.rangePrototype.moveEnd = function (unitType, units) {
         move(this, unitType, units, false);
       };
 
@@ -6256,7 +6256,7 @@ if (!('filter' in Array.prototype)) {
        * Depending on the given `start` boolean, sets the start or end containers
        * to the given `container` with `offset` units.
        */
-      rangy.rangePrototype.setRange = function (start, container, offset) {
+      ice_rangy.rangePrototype.setRange = function (start, container, offset) {
         if (start) {
           this.setStart(container, offset);
         } else {
@@ -6306,7 +6306,7 @@ if (!('filter' in Array.prototype)) {
        *
        * <p><TEXT>some </TEXT><SPAN>test</SPAN><TEXT> text</TEXT></p>
        */
-      rangy.rangePrototype.moveCharLeft = function (moveStart, units) {
+      ice_rangy.rangePrototype.moveCharLeft = function (moveStart, units) {
         var container, offset;
 
         if (moveStart) {
@@ -6401,7 +6401,7 @@ if (!('filter' in Array.prototype)) {
        *
        * <p><TEXT>some </TEXT><SPAN>test</SPAN><TEXT> text</TEXT></p>
        */
-      rangy.rangePrototype.moveCharRight = function (moveStart, units) {
+      ice_rangy.rangePrototype.moveCharRight = function (moveStart, units) {
         var container, offset;
 
         if (moveStart) {
@@ -6455,7 +6455,7 @@ if (!('filter' in Array.prototype)) {
        * For example, if the next container is an element that contains text nodes,
        * the the container's firstChild is returned.
        */
-      rangy.rangePrototype.getNextContainer = function (container, skippedBlockElem) {
+      ice_rangy.rangePrototype.getNextContainer = function (container, skippedBlockElem) {
         if (!container) {
           return null;
         }
@@ -6501,7 +6501,7 @@ if (!('filter' in Array.prototype)) {
        * For example, if the previous container is an element that contains text nodes,
        * then the container's lastChild is returned.
        */
-      rangy.rangePrototype.getPreviousContainer = function (container, skippedBlockElem) {
+      ice_rangy.rangePrototype.getPreviousContainer = function (container, skippedBlockElem) {
         if (!container) {
           return null;
         }
@@ -6545,7 +6545,7 @@ if (!('filter' in Array.prototype)) {
         return this.getPreviousContainer(container, skippedBlockElem);
       };
 
-      rangy.rangePrototype.getNextTextNode = function (container) {
+      ice_rangy.rangePrototype.getNextTextNode = function (container) {
         if (container.nodeType === ice.dom.ELEMENT_NODE) {
           if (container.childNodes.length !== 0) {
             return this.getFirstSelectableChild(container);
@@ -6560,7 +6560,7 @@ if (!('filter' in Array.prototype)) {
         return this.getNextTextNode(container);
       };
 
-      rangy.rangePrototype.getPreviousTextNode = function (container, skippedBlockEl) {
+      ice_rangy.rangePrototype.getPreviousTextNode = function (container, skippedBlockEl) {
         container = this.getPreviousContainer(container, skippedBlockEl);
         if (container.nodeType === ice.dom.TEXT_NODE) {
           return container;
@@ -6569,7 +6569,7 @@ if (!('filter' in Array.prototype)) {
         return this.getPreviousTextNode(container, skippedBlockEl);
       };
 
-      rangy.rangePrototype.getFirstSelectableChild = function (element) {
+      ice_rangy.rangePrototype.getFirstSelectableChild = function (element) {
         if (element) {
           if (element.nodeType !== ice.dom.TEXT_NODE) {
             var child = element.firstChild;
@@ -6596,7 +6596,7 @@ if (!('filter' in Array.prototype)) {
         return null;
       };
 
-      rangy.rangePrototype.getLastSelectableChild = function (element) {
+      ice_rangy.rangePrototype.getLastSelectableChild = function (element) {
         if (element) {
           if (element.nodeType !== ice.dom.TEXT_NODE) {
             var child = element.lastChild;
@@ -6623,14 +6623,14 @@ if (!('filter' in Array.prototype)) {
         return null;
       };
 
-      rangy.rangePrototype.isSelectable = function (container) {
+      ice_rangy.rangePrototype.isSelectable = function (container) {
         if (container && container.nodeType === ice.dom.TEXT_NODE && container.data.length !== 0) {
           return true;
         }
         return false;
       };
 
-      rangy.rangePrototype.getHTMLContents = function (clonedSelection) {
+      ice_rangy.rangePrototype.getHTMLContents = function (clonedSelection) {
         if (!clonedSelection) {
           clonedSelection = this.cloneContents();
         }
@@ -6639,7 +6639,7 @@ if (!('filter' in Array.prototype)) {
         return div.innerHTML;
       };
 
-      rangy.rangePrototype.getHTMLContentsObj = function () {
+      ice_rangy.rangePrototype.getHTMLContentsObj = function () {
         return this.cloneContents();
       };
     }
